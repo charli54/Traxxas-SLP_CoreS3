@@ -27,4 +27,16 @@
 #define INA_MAX_CURRENT   80.0f
 #define INA_SHUNT_RESISTOR 0.001f
 
+// --- GRAPHIQUE ---
+// Couleurs des courbes (et de leur légende)
+#define COULEUR_DISTANCE 0xFFFFFF   // blanc
+#define COULEUR_COURANT  0x0F00FF   // bleu
+#define COULEUR_TENSION  0xFF0000   // rouge
+
+// Pleine échelle minimale de chaque courbe au début d'un enregistrement.
+// Elle s'agrandit automatiquement si une mesure la dépasse.
+#define ECHELLE_MIN_DISTANCE_M 1.0f
+#define ECHELLE_MIN_COURANT_A  5.0f
+#define ECHELLE_MIN_TENSION_V  5.0f
+
 #endif // CONFIG_H

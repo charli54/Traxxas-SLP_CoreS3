@@ -32,7 +32,7 @@ void setup() {
   initInterruptmagneticSwitch();
   initThreadCalculEncodeur();
 
-  clearGraph();
+  initGraph();   // couleurs, axes et légendes du graphique (+ clearGraph)
 
 }
 

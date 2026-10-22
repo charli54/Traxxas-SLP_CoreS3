@@ -13,6 +13,7 @@ void initInterruptmagneticSwitch(void);
 void initThreadCalculEncodeur(void);
 void updateGraph(void);
 void clearGraph(void);
+void initGraph(void);
 
 const uint32_t* getTableauSauvegarde(); 
 
