@@ -6,6 +6,7 @@
 #include "SD_init.h"
 #include "config.h"
 #include "ui/ui.h"
+#include "record.h"
 
 
 USBMSC msc;
@@ -134,73 +135,6 @@ bool isUsbModeActive() {
     return usbMode;
 }
 
-/*
-const char* genererNomFichierUnique(const char* base, const char* ext) {
-    
-    String nomDeBase = String(base);
-    String extension = String(ext);
-    
-    // 2. On déclare la String de sortie en STATIC pour qu'elle survive à la fin de la fonction
-    static String nomFichierFinal;    
-
-    // 1. On teste d'abord le fichier sans index (ex: "/donnees.csv")
-    nomFichierFinal = nomDeBase + extension;
-    
-    if (!SD.exists(nomFichierFinal)) {
-        return nomFichierFinal.c_str(); // Le fichier n'existe pas, on peut l'utiliser direct !
-    }
-
-    // 2. Si le fichier de base existe, on cherche un index libre (ex: _2, _3, _4...)
-    int compteur = 2;
-    while (true) {
-        nomFichierFinal = nomDeBase + "_" + String(compteur) + extension;
-        
-        if (!SD.exists(nomFichierFinal)) {
-            // On a trouvé un emplacement libre !
-            break; 
-        }
-        compteur++; // Sinon, on passe au numéro suivant
-    }
-
-    //on retire l'Extension
-    int indexPoint = nomFichierFinal.lastIndexOf('.');
-
-    String nomFichier = nomFichierFinal.substring(0, indexPoint);
-
-    return nomFichier.c_str();
-}
-
-void sauvegarderDonnees(uint32_t *tableau, int taille, const char* name) {
-    if (taille == 0 || tableau == NULL) {
-            //rien a sauvegarder
-        return;
-    }
-    String uniqueFileName = "/" + String(name) + ".csv";
-
-    //String uniqueFileName = genererNomFichierUnique("/data", ".csv");
-
-    File fichier = SD.open(uniqueFileName, FILE_WRITE);
-    
-    if (fichier) {
-        //if (fichier.size() == 0) {
-        //    fichier.println("Index;Valeur,");
-        }//
-
-        fichier.println("Time(ms);value(m)");
-        // On parcourt le tableau reçu en argument
-        for (int i = 0; i < taille; i++) {
-            fichier.printf("%d;%d\n", (i+1)*50, tableau[i]);
-        }
-        
-        fichier.close(); 
-        //USBSerial.printf("Sauvegarde réussie : %d lignes écrites.\n", taille);
-        //screen1_setLabelSaveState("sauvé");
-    } else {
-        //USBSerial.println("Erreur : Impossible d'ouvrir le fichier sur la carte SD.");
-        //screen1_setLabelSaveState("Not Open");
-    }
-}*/
-
 String genererNomFichierUnique(String nomDeBase, String extension) {
     // 1. On teste d'abord le fichier sans index (ex: "/donnees.csv")
     String nomComplet = nomDeBase + extension;
@@ -224,33 +158,52 @@ String genererNomFichierUnique(String nomDeBase, String extension) {
     return nomComplet;
 }
 
-void sauvegarderDonnees(uint32_t *tableau, int taille) {
-    if (taille == 0 || tableau == NULL) {
-            //screen1_setLabelSaveState("tab Vide");
-        return;
+// Écrit un nombre décimal dans le fichier, avec virgule ou point selon config.h
+static void ecrireDecimal(File& fichier, float valeur, int decimales) {
+    char texte[24];
+    snprintf(texte, sizeof(texte), "%.*f", decimales, valeur);
+#if CSV_VIRGULE_DECIMALE
+    for (char* c = texte; *c; c++) {
+        if (*c == '.') *c = ',';
     }
+#endif
+    fichier.print(texte);
+}
+
+// Sauvegarde du dernier enregistrement : temps, distance, courant, tension
+void sauvegarderDonnees(void) {
+    int taille = getNbPoints();
+    if (taille == 0) {
+        return;  // rien à sauvegarder
+    }
+
+    const uint32_t* temps    = getTableauTemps();
+    const uint32_t* coups    = getTableauSauvegarde();
+    const float*    distance = getTableauDistance();
+    const float*    courant  = getTableauCourant();
+    const float*    tension  = getTableauTension();
+
     String uniqueFileName = genererNomFichierUnique("/Traxxas", ".csv");
 
     File fichier = SD.open(uniqueFileName, FILE_WRITE);
-    
-    if (fichier) {
-        /*if (fichier.size() == 0) {
-            fichier.println("Index;Valeur,");
-        }*/
-
-        fichier.println("Time(ms);value(m)");
-        // On parcourt le tableau reçu en argument
-        for (int i = 0; i < taille; i++) {
-            fichier.printf("%d;%d\n", (i+1)*50, tableau[i]);
-        }
-        
-        fichier.close(); 
-        //USBSerial.printf("Sauvegarde réussie : %d lignes écrites.\n", taille);
-        //screen1_setLabelSaveState("sauvé");
-    } else {
-        //USBSerial.println("Erreur : Impossible d'ouvrir le fichier sur la carte SD.");
-        //screen1_setLabelSaveState("Not Open");
+    if (!fichier) {
+        return;  // impossible d'ouvrir le fichier sur la carte SD
     }
+
+    fichier.println("Temps (ms);Distance (m);Courant (A);Tension (V);Coups encodeur");
+    for (int i = 0; i < taille; i++) {
+        fichier.print(temps[i]);
+        fichier.print(';');
+        ecrireDecimal(fichier, distance[i] / 1000.0f, 3);
+        fichier.print(';');
+        ecrireDecimal(fichier, courant[i], 3);
+        fichier.print(';');
+        ecrireDecimal(fichier, tension[i], 3);
+        fichier.print(';');
+        fichier.println(coups[i]);
+    }
+
+    fichier.close();
 }
 
 const char* imprimerDossier() {

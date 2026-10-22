@@ -37,6 +37,33 @@
 // Elle s'agrandit automatiquement si une mesure la dépasse.
 #define ECHELLE_MIN_DISTANCE_M 1.0f
 #define ECHELLE_MIN_COURANT_A  5.0f
-#define ECHELLE_MIN_TENSION_V  5.0f
+
+// Échelle de tension de départ (axe de droite). Si la batterie est plus haute
+// que TENSION_HAUT_V au début de l'enregistrement, on part de sa tension.
+// Si la tension descend sous TENSION_BAS_V (chute sous charge), l'axe s'élargit vers le bas.
+#define TENSION_HAUT_V 9.0f
+#define TENSION_BAS_V  7.0f
+
+// --- FICHIER CSV ---
+// 1 : virgule décimale (12,345), pratique avec Excel en français et le séparateur ';'
+// 0 : point décimal (12.345)
+#define CSV_VIRGULE_DECIMALE 1
+
+// --- HORLOGE (RTC) ---
+// Par défaut, le RTC est réglé automatiquement à l'heure du PC au moment de
+// la compilation, au premier démarrage après chaque nouveau flash.
+// RTC_DECALAGE_SEC compense le temps entre la compilation et le démarrage
+// (upload + boot). Ajuste-le si l'heure est systématiquement en retard.
+#define RTC_DECALAGE_SEC 20
+
+// Réglage manuel : mettre RTC_REGLAGE_MANUEL à 1, saisir l'heure locale
+// voulue, puis flasher. L'heure est appliquée une seule fois (au premier
+// démarrage avec ces valeurs), pas à chaque redémarrage.
+#define RTC_REGLAGE_MANUEL 0
+#define RTC_ANNEE   2026
+#define RTC_MOIS    10
+#define RTC_JOUR    22
+#define RTC_HEURE   14
+#define RTC_MINUTE  30
 
 #endif // CONFIG_H

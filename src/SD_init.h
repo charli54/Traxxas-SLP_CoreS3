@@ -12,7 +12,7 @@ bool sdInit(void);
 void enableUsbMode();
 void disableUsbMode();
 bool isUsbModeActive();
-void sauvegarderDonnees(uint32_t *tableau, int taille);
+void sauvegarderDonnees(void);
 bool isUSBReady(void);
 //const char* genererNomFichierUnique(const char* nomDeBase, const char* extension);
 //String genererNomFichierUnique(String nomDeBase, String extension);

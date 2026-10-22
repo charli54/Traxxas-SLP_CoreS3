@@ -10,9 +10,7 @@
 
 void saveDataWithName(lv_event_t * e)
 {
-	const uint32_t* tableau = getTableauSauvegarde();
-	//const char* savedName = lv_textarea_get_text(ui_taSavedName);
-	sauvegarderDonnees(tableau, BUFFER_SIZE);
+	sauvegarderDonnees();
 	//lv_label_set_text(ui_lbDebuggScr4, getListFichierCarteSD());
 	lv_roller_set_options(ui_listeDonneesSaved, imprimerDossier(), LV_ROLLER_MODE_NORMAL);
 

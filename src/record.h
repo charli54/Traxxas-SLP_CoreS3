@@ -15,7 +15,13 @@ void updateGraph(void);
 void clearGraph(void);
 void initGraph(void);
 
-const uint32_t* getTableauSauvegarde(); 
+// Accès aux mesures du dernier enregistrement (pour la sauvegarde CSV)
+int getNbPoints(void);
+const uint32_t* getTableauSauvegarde(void);   // coups de l'encodeur
+const uint32_t* getTableauTemps(void);        // ms
+const float* getTableauDistance(void);        // mm
+const float* getTableauCourant(void);         // A
+const float* getTableauTension(void);         // V
 
 
 #ifdef __cplusplus

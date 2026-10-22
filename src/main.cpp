@@ -9,6 +9,7 @@
 #include "config.h"
 #include "record.h"
 #include "INA226_init.h"
+#include "rtc_init.h"
 
 bool lastUSBStateConnected = true;
 bool lastUsbPretEtMonte = false;
@@ -20,6 +21,7 @@ static String listeSD = "";
 void setup() {
   // put your setup code here, to run once:
   screen_init();
+  rtcInit();     // date/heure pour les fichiers de la carte SD
   ui_init();
 
   if(!sdInit()){
